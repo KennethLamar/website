@@ -1,3 +1,7 @@
+Original Hylia template is licensed under the MIT license. 
+Site contents and template modifications copyright Kenneth Lamar. All rights reserved. 
+
+
 MIT License
 
 Copyright (c) 2019 andy-bell.design and other contributors
