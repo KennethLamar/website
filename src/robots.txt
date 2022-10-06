@@ -1,4 +1,4 @@
-Sitemap: https://kennethl.dev/sitemap.xml
+Sitemap: https://kennethmlamar.com/sitemap.xml
 
 User-agent: *
 Disallow:

@@ -58,7 +58,7 @@ The tokens are converted into maps that the Sass uses to compile the front-end C
 
 ### Styleguide
 
-Your version of Hylia ships with a Styleguide by default. You can see a demo of the Styleguide at <https://kennethl.dev/styleguide/>.
+Your version of Hylia ships with a Styleguide by default. You can see a demo of the Styleguide at <https://kennethmlamar.com/styleguide/>.
 
 You can edit the Styleguide by opening [`src/styleguide.njk`](https://github.com/KennethLamar/website/tree/master/src/styleguide.njk). If you don’t want the Styleguide, delete that file and the page will vanish.
 
