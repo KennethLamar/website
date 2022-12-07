@@ -18,6 +18,11 @@
     {
       "text": "CV",
       "url": "/files/CV.pdf",
+      "external": false
+    },
+    {
+      "text": "Photo Portfolio",
+      "url": "https://500px.com/p/kennethlamar",
       "external": true
     }
   ]
