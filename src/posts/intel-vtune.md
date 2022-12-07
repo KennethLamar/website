@@ -14,7 +14,7 @@ tags:
 In any situation where you're running performance-critical code, I would consider profiling to be an essential part of code development. 
 Intel VTune is a performance profiler, used to aid in program optimization by showing how much time is spent in each instruction within a program.
 It supports CPUs, GPUs, FPGAs, a wide variety of languages, multithreaded code, and more.
-It is built on top of [Intel Pin](http://www.intel.com/software/pintool), the same tool used in the original implementation and [my reimplementation](/posts/ConVul/) of [ConVul](https://ieeexplore.ieee.org/abstract/document/8952233).
+It is built on top of [Intel Pin](http://www.intel.com/software/pintool), the same tool used in the original implementation and [my reimplementation](/posts/convul/) of [ConVul](https://ieeexplore.ieee.org/abstract/document/8952233).
 Using this tooling, profiling is performed at run-time, instrumenting code to determine how much time is spent in each section of the code.
 It requires no special build steps, supporting arbitrary binaries out of the box.
 In general, all you'll want to do is enable debug symbols so that reports can include more verbose data like function names.
