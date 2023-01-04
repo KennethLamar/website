@@ -35,7 +35,7 @@ Now I will discuss how I addressed each of these issues.
 
 ### LFTT only works with set-based data structures
 
-LFTT was designed only to work on ordered sets, containers of elements that are either present or absent (just like mathematical sets). In a vector, each element is associated with an index. This means that each of our items must track both an index and a value, not just presence. Supporting this would also be useful for key-value data structures. I accomplished in the transactional vector. 
+LFTT was designed only to work on ordered sets, containers of elements that are either present or absent (just like mathematical sets). In a vector, each element is associated with an index. This means that each of our items must track both an index and a value, not just presence. Supporting this would also be useful for key-value data structures. I added support for this in the transactional vector. 
 
 In a transactional framework, transactions must be "atomic", which is a fancy way of saying either the whole transaction appears to succeed in an instant or fails and never takes effect. Thus, any work done before failure must be reverted. Properly maintaining the right value to pair with a key in LFTT is a surprisingly tricky process, as old values must be properly maintained to logically roll back failed transactions. 
 
