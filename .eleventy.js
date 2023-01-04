@@ -47,28 +47,29 @@ module.exports = function (config) {
 
   // Custom collections
   const livePosts = post => post.date <= now && !post.data.draft;
+  // All posts. Primarily used in archive page and XML feed.
   config.addCollection('posts', collection => {
     return [
       ...collection.getFilteredByGlob('./src/posts/*.md').filter(livePosts)
     ].reverse();
   });
-
+  // Used for home page.
   config.addCollection('postFeed', collection => {
     return [...collection.getFilteredByGlob('./src/posts/*.md').filter(livePosts)]
       .reverse()
       .slice(0, site.maxPostsPerPage);
   });
-
+  // Used for the all tags page.
   config.addCollection('tagList', (collections) => {
-		const uniqueTags = collections
-    .getFilteredByGlob('./src/posts/*.md')
-    .filter(livePosts)
-    .reduce((tags, item) => tags.concat(item.data.tags), [])
-    .filter((tag) => !!tag)
-    .filter((tag) => !!tag && !['page', 'post'].includes(tag))
-    .sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
-		return Array.from(new Set(uniqueTags));
-	});
+    const uniqueTags = collections
+      .getFilteredByGlob('./src/posts/*.md')
+      .filter(livePosts)
+      .reduce((tags, item) => tags.concat(item.data.tags), [])
+      .filter((tag) => !!tag)
+      .filter((tag) => !!tag && !['page', 'post'].includes(tag))
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+    return Array.from(new Set(uniqueTags));
+  });
 
   // Plugins
   config.addPlugin(rssPlugin);
