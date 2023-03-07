@@ -17,7 +17,7 @@ Unlike Xbox, where LAN was a core part of the console, the GameCube adapter was 
 
 In comes Dolphin, a mature GameCube emulator with built-in emulation of the Broadband Adapter. This is a useful solution, as it completely sidesteps the need for a real adapter, or even the need for multiple GameCubes, copies of the disc, TVs, or real GameCube controllers. I got to work trying this out for myself using my own dump of the game and managed a promising configuration where 8 instances of the emulator all networked together as expected. This enabled me to lay out all 8 screens together on one monitor, which I recorded as a proof-of-concept, as seen in my video below. Considering the increasing resolutions and dimensions of modern TVs compared to the CRTs used when the game released, this is actually quite workable. 
 
-https://youtu.be/SaALvm6126U
+https://youtu.be/_FqtYo2NTk4
 
 Later that year, I linked two instances of the emulator together on a laptop and managed 8 player Mario Kart: Double Dash for real, though I didn’t have the opportunity to record the event. 
 
