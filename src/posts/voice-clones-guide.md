@@ -131,7 +131,7 @@ We can leverage this to capture raw audio of the streamer's voice, then trim out
 If you want to record your friends, nothing beats the convenience of a Discord call.
 You don't need to pester them to set up a microphone recording; just get them to join a call with [Craig](https://craig.chat/).
 Craig provides multi-track voice recording for Discord.
-You can set up your own instance of the bot easily using a Docker container that I put together [here](https://github.com/tomich/craig/pull/1).
+You can set up your own instance of the bot easily using [my Docker container](https://github.com/tomich/craig/pull/1) that I put together.
 
 Interestingly, while the [Discord developer policy](https://support-dev.discord.com/hc/en-us/articles/8563934450327-Discord-Developer-Policy) explicitly disallows the collection of *message content* to train AI models, there is no such rule about voice data.
 Thus, your main legal concern is getting the consent of your friends, not just for the creation of the model but also for recording the conversation itself (lest you run afoul of wiretapping laws).
