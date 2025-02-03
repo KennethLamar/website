@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ site.url }}/feed.xml" />
+  <link rel="icon" href="{{ site.faviconPath }}.png" type="image/png" />
+  <link rel="icon" href="{{ site.faviconPath }}.webp" type="image/webp" />
+  <link rel="icon" href="{{ site.faviconPath }}.svg" type="image/svg" />
+  {% include "partials/global/meta-info.njk" %}
+  <script>document.documentElement.classList.remove('no-js');</script>
+  <style>{% include "assets/css/global.css" %}</style>
+  {#
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-D4RED46RPS"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-D4RED46RPS');
+  </script>
+  #}
+  {% block head %}
+  {% endblock %}
+</head>
+<body>
+  {% include "partials/global/site-head.njk" %}
+  {% block content %}
+  {% endblock content %}
+  {% include "partials/global/site-foot.njk" %}
+  {% block foot %}
+  {% endblock %}
+  <script type="module" src="/js/components/theme-toggle.js" async defer></script>
+</body>
+</html>

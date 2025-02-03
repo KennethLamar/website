@@ -1,0 +1,12 @@
+{
+  "showThemeCredit": false,
+  "name": "Kenneth Lamar's Website",
+  "title": "Kenneth Lamar's Website",
+  "shortDesc": "Coverage of my projects, both personal and professional.",
+  "url": "https://kennethmlamar.com",
+  "authorHandle": "@KennethMLamar",
+  "authorName": "Kenneth Lamar",
+  "enableThirdPartyComments": false,
+  "maxPostsPerPage": 5,
+  "faviconPath": "/assets/images/favicon"
+}

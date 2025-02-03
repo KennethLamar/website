@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "text": "Home",
+      "url": "/",
+      "external": false
+    },
+    {
+      "text": "GitHub",
+      "url": "https://github.com/KennethLamar",
+      "external": true
+    },
+    {
+      "text": "Publications",
+      "url": "https://scholar.google.com/citations?user=_OobxegAAAAJ",
+      "external": true
+    },
+    {
+      "text": "CV",
+      "url": "/assets/files/CV.pdf",
+      "external": false
+    },
+    {
+      "text": "Photos",
+      "url": "https://500px.com/p/kennethlamar",
+      "external": true
+    }
+  ]
+}
