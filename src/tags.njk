@@ -1,0 +1,48 @@
+---
+eleventyComputed:
+  title: "Tag Archive - {{ tag }}"
+  metaDesc: "All posts assoiated with the {{ tag }} tag."
+pagination:
+  data: collections
+  size: 1
+  alias: tag
+  filter:
+    - all
+    - nav
+    - post
+    - posts
+    - tagList
+    - postFeed
+  addAllPagesToCollections: true
+permalink: "/tags/{{ tag | slug }}/"
+---
+
+{% extends 'layouts/base.njk' %}
+
+{# Intro content #}
+{% set introHeading %}Posts filed under “{{ tag }}”{% endset %}
+{% set introHeadingLevel = '2' %}
+
+{# Post list content #}
+{% set postListHeadingLevel = '2' %}
+{% set postListHeading = 'Posts' %}
+{% set postListItems = collections[tag] %}
+
+{% block content %}
+  <main id="main-content" tabindex="-1">
+    {% include "partials/components/intro.njk" %}
+    {% include "partials/components/post-list.njk" %}
+    {% include "partials/components/pagination.njk" %}
+    <hr>
+    <div class="inner-wrapper">
+      <footer class="[ pagination ] [ pad-bottom-900 ]">
+        <nav class="[ pagination__nav ] [ box-flex space-between align-center ]">
+          <a href="/tags" class="leading-tight text-500 weight-mid box-inline-flex align-center pad-bottom-300" data-direction="forwards">
+            <span>See all tags</span>
+            {% include "icons/arrow.svg" %}
+          </a>
+        </nav>
+      </footer>
+    </div>
+  </main>
+{% endblock %}

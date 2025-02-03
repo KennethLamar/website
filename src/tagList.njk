@@ -1,0 +1,44 @@
+---
+title: "Tag list"
+metaDesc: "A comprehensive list of all blog post tags."
+permalink: "/tags/"
+---
+
+{% extends 'layouts/base.njk' %}
+
+{# Intro content #}
+{% set introHeading %}All tags{% endset %}
+{% set introHeadingLevel = '2' %}
+
+{% block content %}
+  <main id="main-content" tabindex="-1">
+    {% include "partials/components/intro.njk" %}
+    {% if collections.tagList.length %}
+      <section class="[ post-list ] [ pad-top-700 gap-bottom-900 ]">
+        <div class="[ inner-wrapper ] [ sf-flow ]">
+          <ol class="[ post-list__items ] [ sf-flow ] [ pad-top-300 ]" reversed>
+          {% for tag in collections.tagList %}
+            {% set tagUrl %}/tags/{{ tag | slug }}/{% endset %}
+            <li class="post-list__item">
+              <h3 class="font-base leading-tight text-600 weight-mid">
+                <a href="{{ tagUrl | url }}" class="post-list__link" rel="bookmark">{{ tag }}</a>
+              </h3>
+            </li>
+          {% endfor %}
+          </ol>
+        </div>
+      </section>
+    {% endif %}
+    <hr>
+    <div class="inner-wrapper">
+      <footer class="[ pagination ] [ pad-bottom-900 ]">
+        <nav class="[ pagination__nav ] [ box-flex space-between align-center ]">
+          <a href="/" class="leading-tight text-500 weight-mid box-inline-flex align-center pad-bottom-300" data-direction="forwards">
+            <span>Go home</span>
+            {% include "icons/arrow.svg" %}
+          </a>
+        </nav>
+      </footer>
+    </div>
+  </main>
+{% endblock %}
