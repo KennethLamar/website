@@ -8,7 +8,7 @@ tags:
 ---
 
 I have been experimenting with [RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/en/README.en.md) extensively, which provides tools for voice conversion from audio files as well as real-time conversions.
-For a primer on voice cloning, you can read [my blog post on the matter](/posts/ai-voice-cloning.md).
+For a primer on voice cloning, you can read [my blog post on the matter](/posts/ai-voice-cloning/).
 Below I document what I consider best-practice to maximize voice clone quality while respecting the rights of voice owners.
 
 ## Training Tips
@@ -52,7 +52,7 @@ Most of my upcoming suggestions are only suitable for private use, for the devel
 The easiest way, by far, to get a trained model, is to download one that someone else already made for you.
 There are repositories such as [voice-models.com](https://voice-models.com/) that provide such downloads.
 The issue with using these voices is the complete lack of control over the training process.
-The vast majority of the voices on the platform do not take into account the best-practice training tips I suggest above, often using too little training data as input, using noisy data, overtraining the model, and various other oversights.
+The vast majority of the voices on the platform do not take into account the best-practice training tips I suggest above, often using too little training data as input, using noisy data, overtraining the model, or other oversights.
 Ultimately, there is no way to know if a model found online is any good until you download it and try it for yourself.
 
 ### Vocal Stems
