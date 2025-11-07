@@ -4,11 +4,11 @@
   "description": "A simple Eleventy starter kit to help you have a blog of your own",
   "main": "index.js",
   "dependencies": {
-    "@11ty/eleventy": "^0.12.1",
+    "@11ty/eleventy": "^3.1.2",
     "@11ty/eleventy-plugin-rss": "^1.0.7",
     "@11ty/eleventy-plugin-syntaxhighlight": "^2.0.3",
     "@tbranyen/jsdom": "^13.0.0",
-    "concurrently": "^4.1.2",
+    "concurrently": "^9.2.1",
     "eleventy-plugin-youtube-embed": "^1.6.5",
     "html-minifier": "^4.0.0",
     "image-size": "^0.8.3",
@@ -35,13 +35,13 @@
     "stalfos": "github:hankchizljaw/stalfos#c8971d22726326cfc04089b2da4d51eeb1ebb0eb"
   },
   "devDependencies": {
-    "@11ty/eleventy-img": "^2.0.0",
+    "@11ty/eleventy-img": "^6.0.4",
     "@sardine/eleventy-plugin-tinycss": "^1.5.0",
     "bl": "^3.0.1",
     "chokidar-cli": "^3.0.0",
     "cross-env": "^5.2.1",
     "eleventy-plugin-compress": "^1.0.2",
-    "make-dir-cli": "^2.0.0",
+    "make-dir-cli": "^4.0.0",
     "prettier": "^1.19.1"
   },
   "scripts": {
