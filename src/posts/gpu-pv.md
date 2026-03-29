@@ -22,7 +22,7 @@ While official documentation is scant, there are several tutorials already avail
 
 This blog post provides a textual tutorial and more background on GPU-PV:
 
-{{"https://mu0.cc/2020/08/25/hyperv-gpupv/" | linkPreview:false}}
+{{"https://web.archive.org/web/20231107182321/https://mu0.cc/2020/08/25/hyperv-gpupv/" | linkPreview:false}}
 
 This video provides an excellent guide to set it up yourself as well:
 
