@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMS Blue Coin Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --sky: #0a9fd4;
+    --sky-dark: #077baa;
+    --ocean: #0466a0;
+    --sand: #f5e6c3;
+    --sand-dark: #e0c98a;
+    --coin: #1e9af5;
+    --coin-glow: #5ec8ff;
+    --sun: #ffc933;
+    --sun-dark: #e5a800;
+    --collected: #2dbf6e;
+    --collected-bg: #0f3d22;
+    --missing: #e84040;
+    --missing-bg: #3d0f0f;
+    --bg: #071828;
+    --surface: #0d2538;
+    --surface2: #112e44;
+    --surface3: #163550;
+    --text: #d0eeff;
+    --text-dim: #7aaac8;
+    --border: #1e4d72;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Titillium Web', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0a1f35 0%, #0d3558 50%, #071e32 100%);
+    border-bottom: 2px solid var(--coin);
+    padding: 24px 32px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(30,154,245,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-content { position: relative; max-width: 1100px; margin: 0 auto; }
+  h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--coin-glow);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  h1 span { color: var(--sun); }
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── DROP ZONE ── */
+  #dropzone {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 24px;
+  }
+  .drop-area {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 48px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+    position: relative;
+  }
+  .drop-area:hover, .drop-area.drag-over {
+    border-color: var(--coin);
+    background: var(--surface2);
+    box-shadow: 0 0 0 4px rgba(30,154,245,0.1), inset 0 0 40px rgba(30,154,245,0.05);
+  }
+  .drop-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(94,200,255,0.5));
+  }
+  .drop-area h2 { font-size: 1.1rem; color: var(--text); margin-bottom: 6px; }
+  .drop-area p { font-size: 0.82rem; color: var(--text-dim); }
+  .drop-area p strong { color: var(--coin); }
+  #fileInput { display: none; }
+  .drop-note {
+    margin-top: 16px;
+    font-size: 0.75rem;
+    color: #4a7a9a;
+    line-height: 1.5;
+  }
+
+  /* ── ERROR ── */
+  #error {
+    max-width: 1100px;
+    margin: 0 auto 24px;
+    padding: 0 24px;
+    display: none;
+  }
+  .error-box {
+    background: #2a0808;
+    border: 1px solid #7a1a1a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    color: #ff8080;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── MAIN CONTENT ── */
+  #content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    display: none;
+  }
+
+  /* ── SLOT TABS ── */
+  .slot-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0;
+  }
+  .slot-tab {
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    background: transparent;
+    transition: all 0.15s;
+    margin-bottom: -2px;
+    position: relative;
+  }
+  .slot-tab:hover { color: var(--text); background: var(--surface); }
+  .slot-tab.active {
+    color: var(--coin-glow);
+    background: var(--surface);
+    border-color: var(--border);
+    border-bottom-color: var(--surface);
+  }
+  .slot-tab.empty { opacity: 0.4; cursor: default; }
+  .slot-tab.empty:hover { color: var(--text-dim); background: transparent; }
+  .slot-coins-badge {
+    display: inline-block;
+    margin-left: 6px;
+    background: var(--surface3);
+    border-radius: 99px;
+    padding: 1px 7px;
+    font-size: 0.7rem;
+    color: var(--coin);
+    vertical-align: middle;
+  }
+  .slot-tab.active .slot-coins-badge { background: var(--ocean); }
+
+  /* ── SLOT SUMMARY ── */
+  .slot-summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .summary-stat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    text-align: center;
+    min-width: 90px;
+  }
+  .summary-stat .val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    display: block;
+  }
+  .summary-stat .lbl {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-top: 3px;
+  }
+  .val-collected { color: var(--collected); }
+  .val-missing { color: var(--missing); }
+  .val-total { color: var(--coin); }
+
+  /* Progress bar */
+  .progress-wrap {
+    flex: 1;
+    min-width: 200px;
+  }
+  .progress-bar-outer {
+    height: 8px;
+    background: var(--surface3);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sky), var(--coin-glow));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .filter-btn:hover { border-color: var(--sky); color: var(--text); }
+  .filter-btn.active { background: var(--ocean); border-color: var(--sky); color: #fff; }
+
+  /* ── AREA SECTIONS ── */
+  .area-section {
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .area-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    background: var(--surface2);
+    gap: 12px;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .area-header:hover { background: var(--surface3); }
+  .area-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex: 1;
+    letter-spacing: 0.02em;
+  }
+  .area-progress {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+  }
+  .area-progress.complete { color: var(--collected); }
+  .area-progress.partial { color: var(--sun); }
+  .area-progress.empty { color: var(--text-dim); }
+  .area-mini-bar {
+    width: 80px;
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 99px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .area-mini-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+  .fill-complete { background: var(--collected); }
+  .fill-partial { background: var(--sun); }
+  .fill-empty { background: var(--border); width: 0 !important; }
+  .area-chevron {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .area-section.collapsed .area-chevron { transform: rotate(-90deg); }
+  .area-section.collapsed .area-coins { display: none; }
+
+  .area-coins {
+    padding: 8px 0;
+  }
+
+  /* ── COIN ROWS ── */
+  .coin-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 16px;
+    border-bottom: 1px solid rgba(30,77,114,0.3);
+    transition: background 0.1s;
+    font-size: 0.83rem;
+  }
+  .coin-row:last-child { border-bottom: none; }
+  .coin-row:hover { background: rgba(30,154,245,0.05); }
+  .coin-row.collected .coin-name { color: var(--text-dim); }
+  .coin-row.missing .coin-name { color: var(--text); }
+  .coin-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 700;
+  }
+  .coin-dot.collected {
+    background: var(--collected-bg);
+    border: 1.5px solid var(--collected);
+    color: var(--collected);
+  }
+  .coin-dot.missing {
+    background: rgba(30,154,245,0.15);
+    border: 1.5px solid var(--coin);
+    box-shadow: 0 0 6px rgba(94,200,255,0.4);
+  }
+  .coin-name { flex: 1; line-height: 1.3; }
+  .coin-tag {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.03em;
+  }
+  .tag-graffiti-m { background: #3d1a1a; color: #ff6b6b; }
+  .tag-graffiti-x { background: #3d2a1a; color: #ffa06b; }
+  .tag-graffiti-o { background: #1a2a3d; color: #6bc0ff; }
+  .tag-graffiti-t { background: #2a1a3d; color: #c06bff; }
+  .tag-yoshi      { background: #1a3d1a; color: #6bff8a; }
+  .tag-bird       { background: #1a3333; color: #6bffdf; }
+  .tag-sand       { background: #3d3020; color: #ffd580; }
+  .coin-offset {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    color: #2a5a80;
+    flex-shrink: 0;
+  }
+
+  /* hidden when filter applied */
+  .coin-row.hide { display: none; }
+  .area-section.hide { display: none; }
+
+  .empty-state {
+    padding: 32px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 16px; }
+    h1 { font-size: 1.2rem; }
+    #dropzone, #content { padding: 0 12px; }
+    .area-mini-bar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <h1>🪙 <span>Blue Coin</span> Tracker</h1>
+    <div class="subtitle">Super Mario Sunshine · GCI Save File Reader</div>
+  </div>
+</header>
+
+<div id="dropzone">
+  <div class="drop-area" id="dropArea">
+    <span class="drop-icon">💾</span>
+    <h2>Drop your GCI save file here</h2>
+    <p>or <strong>click to browse</strong> for a file</p>
+    <p class="drop-note">
+      Accepts <strong>.gci</strong> files exported from Dolphin or GCMM<br>
+      Supports NTSC-U (GMSE01), PAL (GMSP01), and NTSC-J (GMSJ01) · All 3 save slots · 240 blue coins
+    </p>
+    <input type="file" id="fileInput" accept=".gci">
+  </div>
+</div>
+
+<div id="error"><div class="error-box" id="errorText"></div></div>
+
+<div id="content">
+  <div class="slot-tabs" id="slotTabs"></div>
+  <div id="slotContent"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  COIN DATABASE  — offset and bit are relative to start of save slot
+//  Labels cross-referenced with game-tools-collection + StrategyWiki
+// ═══════════════════════════════════════════════════════════════════════════
+const AREAS = [
+  {
+    name: "Delfino Plaza",
+    total: 20,
+    coins: [
+      { o:0x6f, b:0, name:"Ice cube on Delfino Airstrip" },
+      { o:0x6f, b:1, name:"Behind breakable doors above water near the lighthouse" },
+      { o:0x6f, b:2, name:"Graffiti X — Bianco Hills statue", tag:"x" },
+      { o:0x6f, b:3, name:"Graffiti X — wall near the boathouse", tag:"x" },
+      { o:0x6f, b:4, name:"Given by extinguishing the Pianta on fire" },
+      { o:0x6f, b:5, name:"Graffiti M — behind crate near the Shine Gate", tag:"m" },
+      { o:0x6f, b:6, name:"Graffiti M — building near Pinna Park cannon", tag:"m" },
+      { o:0x6f, b:7, name:"Graffiti M — behind crate on a rooftop", tag:"m" },
+      { o:0x70, b:0, name:"Given by the 3 pineapples Pianta" },
+      { o:0x70, b:1, name:"Given by the 3 durians Pianta" },
+      { o:0x70, b:2, name:"Given by the 3 bananas Pianta" },
+      { o:0x70, b:3, name:"Given by the 3 coconuts Pianta" },
+      { o:0x70, b:4, name:"Sewer near the island with the 3 coconuts Pianta" },
+      { o:0x70, b:5, name:"Behind yellow jelly near Pinna Park cannon" },
+      { o:0x70, b:6, name:"Inside the jail" },
+      { o:0x70, b:7, name:"Behind yellow jelly above the police station" },
+      { o:0x71, b:0, name:"Sewer near the Corona Mountain entrance" },
+      { o:0x71, b:1, name:"Sewer near the Noki Bay entrance" },
+      { o:0x71, b:2, name:"Blue bird near Sirena Beach pipe (spray it)", tag:"bird" },
+      { o:0x71, b:3, name:"Blue bird to the left of the Shine Gate (spray it)", tag:"bird" },
+    ]
+  },
+  {
+    name: "Bianco Hills",
+    total: 30,
+    coins: [
+      { o:0x75, b:2, name:"Graffiti M — on the windmill", tag:"m" },
+      { o:0x75, b:3, name:"Spraying a pillar near the windmill" },
+      { o:0x75, b:4, name:"In one of the towers of the building near the valley" },
+      { o:0x75, b:5, name:"In a doorway of the house with the balcony" },
+      { o:0x75, b:6, name:"Spraying the top of a palm tree near the wooden wheel" },
+      { o:0x75, b:7, name:"Given by a dirty Pianta" },
+      { o:0x76, b:0, name:"Eating bees with Yoshi", tag:"yoshi" },
+      { o:0x76, b:1, name:"Given by the dirty Pianta at the top of the wall" },
+      { o:0x76, b:2, name:"Defeating a Pokey on the brick platform" },
+      { o:0x76, b:3, name:"On the pillar near the two clouds" },
+      { o:0x76, b:4, name:"Underwater on the right side of the windmill" },
+      { o:0x76, b:5, name:"Underwater on the left side of the windmill" },
+      { o:0x76, b:6, name:"Blue bird in the village (spray it)", tag:"bird" },
+      { o:0x76, b:7, name:"Below the bridge to the windmill" },
+      { o:0x77, b:0, name:"Defeating the Pokey at the top of the windmill" },
+      { o:0x77, b:1, name:"At the top of a platform near the two clouds" },
+      { o:0x77, b:2, name:"Graffiti M — wall near the wooden wheel", tag:"m" },
+      { o:0x77, b:3, name:"Graffiti M — floor of the wall near the wooden wheel", tag:"m" },
+      { o:0x77, b:4, name:"Graffiti M — towers building", tag:"m" },
+      { o:0x77, b:5, name:"Spraying a windmill near the 3 bells" },
+      { o:0x77, b:6, name:"Graffiti X — wall on the other side of the small alcove", tag:"x" },
+      { o:0x77, b:7, name:"Underwater near the wooden planks in the river" },
+      { o:0x78, b:0, name:"On a ledge near the towers building" },
+      { o:0x78, b:1, name:"Above the angry Pianta and her two children" },
+      { o:0x78, b:2, name:"Graffiti O — towers building", tag:"o" },
+      { o:0x78, b:3, name:"Graffiti O — house with the balcony", tag:"o" },
+      { o:0x78, b:4, name:"Blue butterfly with Yoshi", tag:"yoshi" },
+      { o:0x78, b:5, name:"Graffiti X — wall in the small alcove", tag:"x" },
+      { o:0x78, b:6, name:"Floating near a spinning platform" },
+      { o:0x78, b:7, name:"Above one of the highest platforms near the windmill" },
+    ]
+  },
+  {
+    name: "Ricco Harbor",
+    total: 30,
+    coins: [
+      { o:0x7b, b:4, name:"Blue butterfly with Yoshi", tag:"yoshi" },
+      { o:0x7b, b:5, name:"Inside blue shine outline on wall near Ricco Tower" },
+      { o:0x7b, b:6, name:"Graffiti M — side of a ship", tag:"m" },
+      { o:0x7b, b:7, name:"Graffiti M — above warehouse at the entrance", tag:"m" },
+      { o:0x7c, b:0, name:"Graffiti X — building near fruit dispenser", tag:"x" },
+      { o:0x7c, b:1, name:"Eating a Klamber with Yoshi", tag:"yoshi" },
+      { o:0x7c, b:2, name:"Graffiti M — roof near fruit dispenser", tag:"m" },
+      { o:0x7c, b:3, name:"Graffiti M — floor near Ricco Tower", tag:"m" },
+      { o:0x7c, b:4, name:"Graffiti M — ledge with palm trees", tag:"m" },
+      { o:0x7c, b:5, name:"On a blue scaffolding above a rotating crane" },
+      { o:0x7c, b:6, name:"On the highest platform near Ricco Tower" },
+      { o:0x7c, b:7, name:"On a blue scaffolding above a ship" },
+      { o:0x7d, b:0, name:"Floating on the side of a metal support" },
+      { o:0x7d, b:1, name:"Above the Ricco Tower" },
+      { o:0x7d, b:2, name:"Above rotating crane below blue scaffolding" },
+      { o:0x7d, b:3, name:"Above the water near a flag" },
+      { o:0x7d, b:4, name:"Above the water near the tunnel to the race" },
+      { o:0x7d, b:5, name:"Above a fountain" },
+      { o:0x7d, b:6, name:"Underwater below a red platform with an arrow" },
+      { o:0x7d, b:7, name:"Graffiti X — on the Ricco Tower", tag:"x" },
+      { o:0x7e, b:0, name:"Graffiti M — wall of building near fruit dispenser", tag:"m" },
+      { o:0x7e, b:1, name:"Graffiti M — on warehouse at the entrance", tag:"m" },
+      { o:0x7e, b:2, name:"Graffiti M — blue platform", tag:"m" },
+      { o:0x7e, b:3, name:"Defeating a Klamber on a ship (#1)" },
+      { o:0x7e, b:4, name:"Defeating a Klamber on a ship (#2)" },
+      { o:0x7e, b:5, name:"Spraying water on a basket of fish" },
+      { o:0x7e, b:6, name:"Graffiti M — floor of a ship", tag:"m" },
+      { o:0x7e, b:7, name:"Defeating the Blooper inside the yellow cage" },
+      { o:0x7f, b:0, name:"Inside a crate near Ricco Tower" },
+      { o:0x7f, b:1, name:"Spraying the propeller that raises the submarine" },
+    ]
+  },
+  {
+    name: "Gelato Beach",
+    total: 30,
+    coins: [
+      { o:0x81, b:6, name:"Defeating the red Cataquack on the beach" },
+      { o:0x81, b:7, name:"Sand shine outline near the Sand Cabana", tag:"sand" },
+      { o:0x82, b:0, name:"Sand shine outline near the Surf Cabana", tag:"sand" },
+      { o:0x82, b:1, name:"Defeating blue Cataquack at the top of a palm tree" },
+      { o:0x82, b:2, name:"Sand shine outline in the sand near surfboards", tag:"sand" },
+      { o:0x82, b:3, name:"Putting fruit into the watermelon shredder" },
+      { o:0x82, b:4, name:"Graffiti M — ledge near the Sand Cabana", tag:"m" },
+      { o:0x82, b:5, name:"Graffiti Triangle — right side of the beach", tag:"t" },
+      { o:0x82, b:6, name:"Graffiti Triangle — left side of the beach", tag:"t" },
+      { o:0x82, b:7, name:"Below a yellow jelly" },
+      { o:0x83, b:0, name:"Blue bird above the amphitheater — spray it (#1)", tag:"bird" },
+      { o:0x83, b:1, name:"Blue bird above the amphitheater — spray it (#2)", tag:"bird" },
+      { o:0x83, b:2, name:"On the highest rope at end of the amphitheater path" },
+      { o:0x83, b:3, name:"At the top of a pole near the amphitheater" },
+      { o:0x83, b:4, name:"Underwater near the island with palm trees (#1)" },
+      { o:0x83, b:5, name:"Underwater near the island with palm trees (#2)" },
+      { o:0x83, b:6, name:"Underwater following a school of blue fish" },
+      { o:0x83, b:7, name:"Underwater following a school of red fish" },
+      { o:0x84, b:0, name:"Below the Surf Cabana" },
+      { o:0x84, b:1, name:"Using a swing on a palm tree at the starting point" },
+      { o:0x84, b:2, name:"At the top of the palm tree with the swing" },
+      { o:0x84, b:3, name:"End of the amphitheater path, between two walls" },
+      { o:0x84, b:4, name:"Sand shine outline on the peninsula", tag:"sand" },
+      { o:0x84, b:5, name:"On the ceiling of the Sand Cabana" },
+      { o:0x84, b:6, name:"Above platform with umbrella on the left side of the beach" },
+      { o:0x84, b:7, name:"Eating bees with Yoshi", tag:"yoshi" },
+      { o:0x85, b:0, name:"Sand Bird level — above a cloud (#1)", tag:"sand" },
+      { o:0x85, b:1, name:"Sand Bird level — above a cloud (#2)", tag:"sand" },
+      { o:0x85, b:2, name:"Sand Bird level — above a cloud (#3)", tag:"sand" },
+      { o:0x85, b:3, name:"Sand Bird level — above a cloud (#4)", tag:"sand" },
+    ]
+  },
+  {
+    name: "Pinna Park",
+    total: 30,
+    coins: [
+      { o:0x88, b:0, name:"Graffiti M — wall with the orange arch", tag:"m" },
+      { o:0x88, b:1, name:"Graffiti M — beach near the pool", tag:"m" },
+      { o:0x88, b:2, name:"Inside the green shell on the Clam Cups ride" },
+      { o:0x88, b:3, name:"Graffiti O — side of the Ferris wheel axle", tag:"o" },
+      { o:0x88, b:4, name:"Blue bird at the entrance (spray it)", tag:"bird" },
+      { o:0x88, b:5, name:"Blue bird near the wooden bridge (spray it)", tag:"bird" },
+      { o:0x88, b:6, name:"Floating above the swinging ships" },
+      { o:0x88, b:7, name:"At the top of the highest platform of the swinging ships" },
+      { o:0x89, b:0, name:"Graffiti O — floor of the Ferris wheel axle", tag:"o" },
+      { o:0x89, b:1, name:"Graffiti X — wall near the pool", tag:"x" },
+      { o:0x89, b:2, name:"Graffiti X — mouth of the Pianta tree", tag:"x" },
+      { o:0x89, b:3, name:"Graffiti M — near the water wall", tag:"m" },
+      { o:0x89, b:4, name:"Graffiti Triangle — ledge with a banana", tag:"t" },
+      { o:0x89, b:5, name:"Graffiti Triangle — at the Ferris wheel", tag:"t" },
+      { o:0x89, b:6, name:"Below the stairs of the swinging ships" },
+      { o:0x89, b:7, name:"Blue butterfly with Yoshi near the pond", tag:"yoshi" },
+      { o:0x8a, b:0, name:"On the swinging ships support" },
+      { o:0x8a, b:1, name:"On the ledge of a pillar near the pool" },
+      { o:0x8a, b:2, name:"Inside the green cage near the swinging ships" },
+      { o:0x8a, b:3, name:"Defeating a tower of Strollin' Stu" },
+      { o:0x8a, b:4, name:"Inside a Bullet Bill basket near the entrance (#1)" },
+      { o:0x8a, b:5, name:"Inside a Bullet Bill basket near the entrance (#2)" },
+      { o:0x8a, b:6, name:"Inside a Bullet Bill basket near the entrance (#3)" },
+      { o:0x8a, b:7, name:"Blue butterfly with Yoshi near the sunflowers (#1)", tag:"yoshi" },
+      { o:0x8b, b:0, name:"Blue butterfly with Yoshi near the sunflowers (#2)", tag:"yoshi" },
+      { o:0x8b, b:1, name:"Inside a Bullet Bill basket on the beach (#1)" },
+      { o:0x8b, b:2, name:"Inside a Bullet Bill basket on the beach (#2)" },
+      { o:0x8b, b:3, name:"Inside a Bullet Bill basket on the beach (#3)" },
+      { o:0x8b, b:4, name:"Inside blue shine outline near the sunflowers" },
+      { o:0x8b, b:5, name:"Inside blue shine outline near the cannon" },
+    ]
+  },
+  {
+    name: "Sirena Beach",
+    total: 30,
+    coins: [
+      { o:0x8e, b:2, name:"Spraying a tablet near the lawn chairs" },
+      { o:0x8e, b:3, name:"On the ceiling of a hut" },
+      { o:0x8e, b:4, name:"Spraying a torch in front of the hotel" },
+      { o:0x8e, b:5, name:"Given by a dirty Noki near the left pool (#1)" },
+      { o:0x8e, b:6, name:"Given by a dirty Noki near the left pool (#2)" },
+      { o:0x8e, b:7, name:"On a ledge at back of the second floor of the hotel" },
+      { o:0x8f, b:0, name:"Spraying the ceiling lamp of the hotel" },
+      { o:0x8f, b:1, name:"Inside a crate in the room below the storage room" },
+      { o:0x8f, b:2, name:"In the room next to the crates room" },
+      { o:0x8f, b:3, name:"In the room below the breakable glass table" },
+      { o:0x8f, b:4, name:"Spraying a mirror in the room with the glass table" },
+      { o:0x8f, b:5, name:"Room next to the storage room — behind a poster" },
+      { o:0x8f, b:6, name:"Spraying a cupboard in the storage room" },
+      { o:0x8f, b:7, name:"In the air duct" },
+      { o:0x90, b:0, name:"Given by a dirty Noki near the lawn chairs (#1)" },
+      { o:0x90, b:1, name:"Defeating the Boo in the air duct" },
+      { o:0x90, b:2, name:"Spraying the flowerbed to the right of the hotel" },
+      { o:0x90, b:3, name:"Underwater on the right side of the beach" },
+      { o:0x90, b:4, name:"Graffiti M — to the right of the hotel", tag:"m" },
+      { o:0x90, b:5, name:"Graffiti M — on the third floor", tag:"m" },
+      { o:0x90, b:6, name:"Given by a dirty Noki near the lawn chairs (#2)" },
+      { o:0x90, b:7, name:"Graffiti M — above the entrance of the casino", tag:"m" },
+      { o:0x91, b:0, name:"Spraying a lamp on the third floor of the hotel" },
+      { o:0x91, b:1, name:"Graffiti Triangle — on the first floor", tag:"t" },
+      { o:0x91, b:2, name:"Graffiti Triangle — on the second floor", tag:"t" },
+      { o:0x91, b:3, name:"Graffiti M — in the air duct", tag:"m" },
+      { o:0x91, b:4, name:"Graffiti X — on the third floor", tag:"x" },
+      { o:0x91, b:5, name:"Graffiti X — on the second floor", tag:"x" },
+      { o:0x91, b:6, name:"Spraying a torch in the casino" },
+      { o:0x91, b:7, name:"Ground pounding a slot machine in the casino" },
+    ]
+  },
+  {
+    name: "Noki Bay",
+    total: 30,
+    coins: [
+      { o:0x9a, b:6, name:"Top right of level — above the Rocket Nozzle box" },
+      { o:0x9a, b:7, name:"Hidden in the center of a tall wall" },
+      { o:0x9b, b:0, name:"Hidden in a small alcove above the tall wall" },
+      { o:0x9b, b:1, name:"Top right of level — using the Rocket Nozzle" },
+      { o:0x9b, b:2, name:"Hidden in wall near climbable ledge near the 2nd vase" },
+      { o:0x9b, b:3, name:"Hidden in wall near climbable ledge above the 2nd vase" },
+      { o:0x9b, b:4, name:"Floating in a vertical tunnel at end of climbing ledge" },
+      { o:0x9b, b:5, name:"Alcove below the platform next to the top of the waterfall" },
+      { o:0x9b, b:6, name:"Alcove at the same height as the purple shell" },
+      { o:0x9b, b:7, name:"Hidden in one of the seven brown tiles on the left side (#1)" },
+      { o:0x9c, b:0, name:"Hidden in one of the seven brown tiles on the left side (#2)" },
+      { o:0x9c, b:1, name:"Alcove above the 1-Up on the left side" },
+      { o:0x9c, b:2, name:"Alcove to the left of the 1-Up" },
+      { o:0x9c, b:3, name:"Hidden in two brown tiles on the left side" },
+      { o:0x9c, b:4, name:"Hidden in three alcoves on the left side" },
+      { o:0x9c, b:5, name:"Hidden in two vertical alcoves on the left side" },
+      { o:0x9c, b:6, name:"Hidden in two brown tiles on the very left side" },
+      { o:0x9c, b:7, name:"Hidden in two alcoves on the very left side" },
+      { o:0x9d, b:0, name:"Spraying a vase in the ancient Noki king's tomb (#1)" },
+      { o:0x9d, b:1, name:"Spraying a vase in the ancient Noki king's tomb (#2)" },
+      { o:0x9d, b:2, name:"Floating above the water near the starting point" },
+      { o:0x9d, b:3, name:"Floating above the water near the shore" },
+      { o:0x9d, b:4, name:"Underwater below the waterfall" },
+      { o:0x9d, b:5, name:"Graffiti M — near a movable wall", tag:"m" },
+      { o:0x9d, b:6, name:"Graffiti O — near the starting point", tag:"o" },
+      { o:0x9d, b:7, name:"Top of a pillar in the underwater city (#1)" },
+      { o:0x9e, b:0, name:"Top of a pillar in the underwater city (#2)" },
+      { o:0x9e, b:1, name:"Top of a pillar in the underwater city (#3)" },
+      { o:0x9e, b:2, name:"Graffiti O — near the mudboat rental", tag:"o" },
+      { o:0x9e, b:3, name:"Top of a pillar in the underwater city (#4)" },
+    ]
+  },
+  {
+    name: "Pianta Village",
+    total: 30,
+    coins: [
+      { o:0x94, b:4, name:"Spraying the moon atop the golden mushroom" },
+      { o:0x94, b:5, name:"Cleaning a Pianta on the right side of the level" },
+      { o:0x94, b:6, name:"Cleaning a Pianta near the fruit tree (#1)" },
+      { o:0x94, b:7, name:"Cleaning a Pianta near the hot spring" },
+      { o:0x95, b:0, name:"Cleaning a Pianta near the fruit tree (#2)" },
+      { o:0x95, b:1, name:"Cleaning a Pianta near the giant tree" },
+      { o:0x95, b:2, name:"Cleaning a Pianta near the couple" },
+      { o:0x95, b:3, name:"Cleaning a Pianta after the bridge (#1)" },
+      { o:0x95, b:4, name:"Cleaning a Pianta after the bridge (#2)" },
+      { o:0x95, b:5, name:"Ground pounding the nose of the Pianta statue at hot spring" },
+      { o:0x95, b:6, name:"Graffiti M — floor near the golden mushroom (#1)", tag:"m" },
+      { o:0x95, b:7, name:"Spraying the signpost after the main bridge" },
+      { o:0x96, b:0, name:"At one end of the river" },
+      { o:0x96, b:1, name:"In a tall grass area" },
+      { o:0x96, b:2, name:"At the top of the palm tree near the hot spring" },
+      { o:0x96, b:3, name:"Below the bridge above the river" },
+      { o:0x96, b:4, name:"Eating bees with Yoshi near the hot spring", tag:"yoshi" },
+      { o:0x96, b:5, name:"Eating bees with Yoshi after the main bridge", tag:"yoshi" },
+      { o:0x96, b:6, name:"On a platform at the top of a palm tree" },
+      { o:0x96, b:7, name:"Spraying water on wooden bars on the giant tree" },
+      { o:0x97, b:0, name:"Blue butterflies with Yoshi near the fruit tree", tag:"yoshi" },
+      { o:0x97, b:1, name:"Blue bird on the giant tree (spray it)", tag:"bird" },
+      { o:0x97, b:2, name:"Given by extinguishing the Pianta on fire" },
+      { o:0x97, b:3, name:"Graffiti Triangle — wall near a swing", tag:"t" },
+      { o:0x97, b:4, name:"Graffiti Triangle — wall near the hot spring", tag:"t" },
+      { o:0x97, b:5, name:"Graffiti M — wall below the village", tag:"m" },
+      { o:0x97, b:6, name:"Graffiti M — wall near the giant tree", tag:"m" },
+      { o:0x97, b:7, name:"Graffiti M — behind the starting point", tag:"m" },
+      { o:0x98, b:0, name:"Graffiti M — ceiling below the village", tag:"m" },
+      { o:0x98, b:1, name:"Graffiti M — floor near the golden mushroom (#2)", tag:"m" },
+    ]
+  },
+  {
+    name: "Corona Mountain",
+    total: 10,
+    coins: [
+      { o:0xa3, b:4, name:"On the first lava platform" },
+      { o:0xa3, b:5, name:"Around the final platform (#1)" },
+      { o:0xa3, b:6, name:"Around the final platform (#2)" },
+      { o:0xa3, b:7, name:"Around the final platform (#3)" },
+      { o:0xa4, b:0, name:"Around the final platform (#4)" },
+      { o:0xa4, b:1, name:"Around the final platform (#5)" },
+      { o:0xa4, b:2, name:"Around the final platform (#6)" },
+      { o:0xa4, b:3, name:"Around the final platform (#7)" },
+      { o:0xa4, b:4, name:"Around the final platform (#8)" },
+      { o:0xa4, b:5, name:"Around the final platform (#9)" },
+    ]
+  }
+];
+
+const TAG_INFO = {
+  m:    { label:"M",        cls:"tag-graffiti-m", title:"Shadow Mario graffiti" },
+  x:    { label:"X",        cls:"tag-graffiti-x", title:"Shadow Mario graffiti" },
+  o:    { label:"◯",        cls:"tag-graffiti-o", title:"Shadow Mario graffiti" },
+  t:    { label:"△",        cls:"tag-graffiti-t", title:"Shadow Mario graffiti" },
+  yoshi:{ label:"Yoshi",    cls:"tag-yoshi",      title:"Requires Yoshi" },
+  bird: { label:"Blue Bird",cls:"tag-bird",       title:"Blue bird interaction" },
+  sand: { label:"Sand",     cls:"tag-sand",       title:"Sand shine outline / Sand Bird level" },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  GCI PARSING
+// ═══════════════════════════════════════════════════════════════════════════
+
+const VALID_IDS = ['GMSE01','GMSP01','GMSJ01','GMSK01']; // US, PAL, JPN, KOR
+
+function readUint32BE(data, offset) {
+  return ((data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3]) >>> 0;
+}
+
+function getBit(data, byteOffset, bit) {
+  return (data[byteOffset] >> bit) & 1;
+}
+
+function parseGCI(buffer) {
+  const data = new Uint8Array(buffer);
+
+  // Validate game ID
+  const gameId = String.fromCharCode(data[0],data[1],data[2],data[3],data[4],data[5]);
+  if (!VALID_IDS.includes(gameId)) {
+    throw new Error(`Not a Super Mario Sunshine save. Found game ID: "${gameId}"\nExpected one of: ${VALID_IDS.join(', ')}`);
+  }
+
+  // Each "slot" in the game uses 0x4000 bytes (two 0x2000-byte copies).
+  // Layout: 0x40 GCI header + 0x2000 banner/icon + 3 × 0x4000 save slots
+  const ICON_SIZE = 0x2000;
+  const SLOT_STRIDE = 0x4000;
+  const HEADER = 0x40;
+  const expectedSize = HEADER + ICON_SIZE + 3 * SLOT_STRIDE; // 0xe040
+
+  if (data.length < expectedSize) {
+    throw new Error(`File too small. Expected ${expectedSize} bytes, got ${data.length}. Is this a complete GCI?`);
+  }
+
+  const slots = [];
+  for (let i = 0; i < 3; i++) {
+    const baseA = HEADER + ICON_SIZE + i * SLOT_STRIDE;
+    const baseB = baseA + 0x2000;
+
+    const saveA = readUint32BE(data, baseA);
+    const saveB = readUint32BE(data, baseB);
+
+    const isEmpty = (saveA === 0 && saveB === 0);
+    const base = (!isEmpty && saveB > saveA) ? baseB : baseA;
+
+    slots.push({ index: i, isEmpty, base, saveCount: Math.max(saveA, saveB) });
+  }
+
+  return { gameId, data, slots };
+}
+
+function readCoinState(data, slotBase) {
+  const result = {};
+  let total = 0;
+  for (const area of AREAS) {
+    let collected = 0;
+    const coins = area.coins.map(c => {
+      const got = getBit(data, slotBase + c.o, c.b) === 1;
+      if (got) { collected++; total++; }
+      return { ...c, collected: got };
+    });
+    result[area.name] = { coins, collected, total: area.total };
+  }
+  return { areas: result, total };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  UI RENDERING
+// ═══════════════════════════════════════════════════════════════════════════
+
+let parsedFile = null;
+let activeSlot = -1;
+let activeFilter = 'all';
+
+function showError(msg) {
+  const el = document.getElementById('error');
+  document.getElementById('errorText').textContent = msg;
+  el.style.display = 'block';
+}
+function clearError() {
+  document.getElementById('error').style.display = 'none';
+}
+
+function renderSlotTabs(slots) {
+  const tabs = document.getElementById('slotTabs');
+  tabs.innerHTML = '';
+  slots.forEach((slot, i) => {
+    const tab = document.createElement('button');
+    tab.className = 'slot-tab' + (slot.isEmpty ? ' empty' : '');
+    if (!slot.isEmpty) {
+      const state = readCoinState(parsedFile.data, slot.base);
+      tab.innerHTML = `Mario ${i+1} <span class="slot-coins-badge">${state.total}/240</span>`;
+    } else {
+      tab.textContent = `Mario ${i+1} — Empty`;
+    }
+    tab.addEventListener('click', () => {
+      if (slot.isEmpty) return;
+      activeSlot = i;
+      document.querySelectorAll('.slot-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderSlotContent(slot);
+    });
+    if (!slot.isEmpty && activeSlot === -1) {
+      activeSlot = i;
+      tab.classList.add('active');
+    }
+    if (activeSlot === i) tab.classList.add('active');
+    tabs.appendChild(tab);
+  });
+}
+
+function renderSlotContent(slot) {
+  const state = readCoinState(parsedFile.data, slot.base);
+  const container = document.getElementById('slotContent');
+  container.innerHTML = '';
+
+  // Summary
+  const missing = 240 - state.total;
+  const pct = Math.round((state.total / 240) * 100);
+  const summary = document.createElement('div');
+  summary.className = 'slot-summary';
+  summary.innerHTML = `
+    <div class="summary-stat"><span class="val val-collected">${state.total}</span><span class="lbl">Collected</span></div>
+    <div class="summary-stat"><span class="val val-missing">${missing}</span><span class="lbl">Missing</span></div>
+    <div class="summary-stat"><span class="val val-total">240</span><span class="lbl">Total</span></div>
+    <div class="progress-wrap">
+      <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pct}%"></div></div>
+      <div class="progress-label">${pct}% complete · Save #${slot.saveCount}</div>
+    </div>`;
+  container.appendChild(summary);
+
+  // Filter bar
+  const filterBar = document.createElement('div');
+  filterBar.className = 'filter-bar';
+  const filters = [
+    { id:'all',       label:'All coins' },
+    { id:'missing',   label:'Missing only' },
+    { id:'collected', label:'Collected only' },
+    { id:'m',         label:'M Graffiti' },
+    { id:'x',         label:'X Graffiti' },
+    { id:'yoshi',     label:'Yoshi' },
+    { id:'bird',      label:'Blue Bird' },
+  ];
+  filters.forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (activeFilter === f.id ? ' active' : '');
+    btn.textContent = f.label;
+    btn.addEventListener('click', () => {
+      activeFilter = f.id;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter(container);
+    });
+    filterBar.appendChild(btn);
+  });
+  container.appendChild(filterBar);
+
+  // Area sections
+  AREAS.forEach(areaDef => {
+    const areaState = state.areas[areaDef.name];
+    const section = buildAreaSection(areaDef.name, areaState);
+    container.appendChild(section);
+  });
+
+  applyFilter(container);
+}
+
+function buildAreaSection(areaName, areaState) {
+  const { coins, collected, total } = areaState;
+  const pct = collected / total;
+  const isComplete = collected === total;
+  const isEmpty = collected === 0;
+
+  const section = document.createElement('div');
+  section.className = 'area-section';
+  section.dataset.area = areaName;
+
+  const fillClass = isComplete ? 'fill-complete' : isEmpty ? 'fill-empty' : 'fill-partial';
+  const progressClass = isComplete ? 'complete' : isEmpty ? 'empty' : 'partial';
+
+  const header = document.createElement('div');
+  header.className = 'area-header';
+  header.innerHTML = `
+    <span class="area-name">${areaName}</span>
+    <div class="area-mini-bar"><div class="area-mini-fill ${fillClass}" style="width:${Math.round(pct*100)}%"></div></div>
+    <span class="area-progress ${progressClass}">${collected}/${total}</span>
+    <span class="area-chevron">▼</span>`;
+  header.addEventListener('click', () => section.classList.toggle('collapsed'));
+  section.appendChild(header);
+
+  const coinsEl = document.createElement('div');
+  coinsEl.className = 'area-coins';
+
+  coins.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'coin-row ' + (c.collected ? 'collected' : 'missing');
+    row.dataset.collected = c.collected ? '1' : '0';
+    row.dataset.tag = c.tag || '';
+
+    let tagHtml = '';
+    if (c.tag && TAG_INFO[c.tag]) {
+      const t = TAG_INFO[c.tag];
+      tagHtml = `<span class="coin-tag ${t.cls}" title="${t.title}">${t.label}</span>`;
+    }
+
+    const dot = c.collected
+      ? `<span class="coin-dot collected" title="Collected">✓</span>`
+      : `<span class="coin-dot missing" title="Not collected"></span>`;
+
+    row.innerHTML = `
+      ${dot}
+      <span class="coin-name">${c.name}</span>
+      ${tagHtml}
+      <span class="coin-offset" title="Save offset">${'0x'+c.o.toString(16).padStart(2,'0')}:${c.b}</span>`;
+
+    coinsEl.appendChild(row);
+  });
+
+  section.appendChild(coinsEl);
+  return section;
+}
+
+function applyFilter(container) {
+  const rows = container.querySelectorAll('.coin-row');
+  const sections = container.querySelectorAll('.area-section');
+
+  rows.forEach(row => {
+    let show = true;
+    if (activeFilter === 'missing')   show = row.dataset.collected === '0';
+    else if (activeFilter === 'collected') show = row.dataset.collected === '1';
+    else if (['m','x','o','t','yoshi','bird','sand'].includes(activeFilter))
+      show = row.dataset.tag === activeFilter;
+    row.classList.toggle('hide', !show);
+  });
+
+  // Hide sections with no visible rows
+  sections.forEach(sec => {
+    const anyVisible = [...sec.querySelectorAll('.coin-row')].some(r => !r.classList.contains('hide'));
+    sec.classList.toggle('hide', !anyVisible);
+
+    // Auto-expand sections that have missing coins when filtering by missing
+    if (activeFilter === 'missing' && !sec.classList.contains('hide')) {
+      const hasMissing = [...sec.querySelectorAll('.coin-row.missing')].some(r => !r.classList.contains('hide'));
+      if (hasMissing) sec.classList.remove('collapsed');
+    }
+  });
+}
+
+function handleFile(file) {
+  clearError();
+  if (!file) return;
+  if (!file.name.endsWith('.gci') && !file.name.endsWith('.GCI')) {
+    showError('Please load a .gci file. You can export one from Dolphin: Tools → Memory Card Manager → Export.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      parsedFile = parseGCI(e.target.result);
+      activeSlot = -1;
+      activeFilter = 'all';
+      document.getElementById('dropzone').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      renderSlotTabs(parsedFile.slots);
+      const firstActive = parsedFile.slots.find(s => !s.isEmpty);
+      if (firstActive) renderSlotContent(firstActive);
+      else showError('All 3 save slots are empty.');
+    } catch(err) {
+      document.getElementById('dropzone').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
+      showError(err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── EVENT WIRING ──
+const dropArea = document.getElementById('dropArea');
+const fileInput = document.getElementById('fileInput');
+
+dropArea.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('drag-over'); });
+dropArea.addEventListener('dragleave', () => dropArea.classList.remove('drag-over'));
+dropArea.addEventListener('drop', e => {
+  e.preventDefault();
+  dropArea.classList.remove('drag-over');
+  handleFile(e.dataTransfer.files[0]);
+});
+</script>
+</body>
+</html>
