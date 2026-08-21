@@ -21,7 +21,7 @@ First, create a `.service` file under `/etc/systemd/system/`. For the sake of th
 sudo touch /etc/systemd/system/{{postData.serviceName}}.service
 ```
 
-Each `.service` file follows the syntax documented [here](https://www.freedesktop.org/software/systemd/man/systemd.syntax.html). My typical use requires only a few changes to a base set of contents, so I will provide that template here. Use this template to modify `{{postData.serviceName}}.service` as needed, saving as root. The purpose of each line is described below in comments. 
+Each `.service` file follows the syntax documented [in the systemd.syntax reference](https://www.freedesktop.org/software/systemd/man/systemd.syntax.html). My typical use requires only a few changes to a base set of contents, so I will provide that template here. Use this template to modify `{{postData.serviceName}}.service` as needed, saving as root. The purpose of each line is described below in comments. 
 ```systemd
 # /etc/systemd/system/{{postData.serviceName}}.service
 

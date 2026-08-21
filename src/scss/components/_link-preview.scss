@@ -2,49 +2,58 @@
 	border: 1px solid get-color('highlight');
 	margin-bottom: 20px;
 	margin-top: 20px;
-  text-decoration: none;
   display: block;
-  
-  .flow {
+  background: var(--color-bg-glare);
+  overflow: hidden;
+
+  // The whole card is one clickable link.
+  .lp-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  // Preview image on top of the card. The global img rule (global.scss)
+  // forces width:100%, which would upscale a small logo — so reset to
+  // auto and cap at the card width instead. Larger images shrink to the
+  // card; smaller ones render at intrinsic size, centered.
+  > .lp-img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    border-bottom: 1px solid get-color('highlight');
+  }
+
+  // Site icon: small, inline with the title.
+  .fav {
+    display: block;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    object-fit: contain;
+  }
+
+  // Metadata row: icon + text, beneath the preview image.
+  .met {
     display: flex;
     flex-flow: row;
-  }
-
-  .img {
-    display: block;
-    flex: 0 0 100px;
-    background-color: get-color('highlight');
-    min-height: 100px;
-    border-right:1px solid get-color('highlight');
-    position: relative;
-
-    img {
-      position: absolute;
-      left: 0px;
-      top: 0px;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  }
-  
-  // Metadata
-  .met {
-    display: block;
-    flex: 1 0px;	
-    padding: 8px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    overflow: hidden;
-    margin: 0px;
+    padding: 12px;
     font-size: get-size(300);
     line-height: 16px;
-    background: var(--color-bg-glare);
     color: var(--color-text);
+  }
+
+  // Text column.
+  .txt {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     flex-direction: column;
   }
-  
+
   // Title
   .ttl {
     display: block;
@@ -57,19 +66,18 @@
     color: var(--color-text);
     padding-inline: 1px;
   }
-  
+
   // Author, publisher, description
   .by, .pub, .dsc {
     font-size: get-size(300);
-    //margin-top: 8px;
-    color: var(--color-text);	
+    color: var(--color-text);
     display: block;
     overflow: hidden;
     white-space: nowrap;
-    padding-inline: 1px;
     text-overflow: ellipsis;
+    padding-inline: 1px;
   }
-  
+
   // Description
   .dsc {
     max-height: 80px;
@@ -83,7 +91,7 @@
     flex-flow: row;
     margin-top: auto;
   }
-  
+
   // Author before text
   .by::before {
     content: "by ";

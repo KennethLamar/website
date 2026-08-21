@@ -1,66 +1,88 @@
-const metascraper = require('metascraper')([
-  require('metascraper-youtube')(),
-  require('metascraper-amazon')(),
-  require('metascraper-spotify')(),
-  require('metascraper-soundcloud')(),
-  require('metascraper-title')(),
-  require('metascraper-url')(),
-  require('metascraper-author')(),
-  require('metascraper-date')(),
-  require('metascraper-description')(),
-  require('metascraper-image')(),
-  require('metascraper-logo')(),
-  require('metascraper-logo-favicon')(),
-  require('metascraper-publisher')(),
-  require('metascraper-clearbit')()
-])
-const got = require('got')
+/*
+ * Link preview filter
+ *
+ * {{ "https://example.com" | linkPreview: true }}
+ *
+ * Metadata is precomputed offline — `npm run fetch:previews` writes
+ * .cache/link-previews.json (gitignored; the build's beforeBuild hook
+ * refetches it on a fresh clone), which this filter reads. Warm builds
+ * stay fast and never need network access. URLs without a cached entry
+ * fall back to a plain (linkified) link.
+ */
+const fs = require('fs');
+const path = require('path');
+const { markdown } = require('../utils/markdown.js');
 
-// Temporary while fixing async version.
-const markdownIt = require('markdown-it')({
-  html: true,
-  breaks: true,
-  linkify: true
-});
+const DATA_FILE = path.join(__dirname, '..', '..', '.cache', 'link-previews.json');
 
-const NodeCache = require( "node-cache" );
-const cache = new NodeCache();
+let cached = {};
+let cachedMtime = 0;
 
-module.exports = function linkPreviewFilter(targetUrl, fullImage=false) {
-  return markdownIt.render(targetUrl)
+function loadPreviews() {
+  try {
+    const stat = fs.statSync(DATA_FILE);
+    if (stat.mtimeMs !== cachedMtime) {
+      cached = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      cachedMtime = stat.mtimeMs;
+    }
+    return cached;
+  } catch {
+    return {};
+  }
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+module.exports = function linkPreviewFilter(targetUrl, fullImage = false) {
+  const meta = loadPreviews()[targetUrl];
+
+  // No cached metadata: render as a plain link.
+  if (!meta || (!meta.title && !meta.description)) {
+    return markdown.render(targetUrl);
+  }
+
+  const title = meta.title || targetUrl;
+  const logo = meta.logo || meta.logoFavicon || '';
+  const image = fullImage ? (meta.image || '') : '';
+
+  // One card: preview image on top, then icon + title + description
+  // beneath it. The outer element must be a block-level tag: Markdown
+  // treats a line starting with <div> as a raw HTML block, while an
+  // <a> wrapper would be wrapped in <p> — and browsers close that <p>
+  // at the first inner <div>, splitting the card apart.
+  // width/height keep the layout stable while the image loads (CLS).
+  const imgAttrs =
+    meta.imageWidth && meta.imageHeight
+      ? ` width="${meta.imageWidth}" height="${meta.imageHeight}"`
+      : '';
+  const favAttrs =
+    meta.logoWidth && meta.logoHeight
+      ? ` width="${meta.logoWidth}" height="${meta.logoHeight}"`
+      : '';
+
+  let html = `<div class="lp">
+    <a class="lp-link" href="${escapeHtml(targetUrl)}">` +
+    (image
+      ? `<img class="lp-img" src="${escapeHtml(image)}" alt="${escapeHtml(title)}"${imgAttrs}>`
+      : '') +
+    '<div class="met">' +
+    (logo
+      ? `<img class="fav" src="${escapeHtml(logo)}" alt="${escapeHtml(meta.publisher || 'Site icon')}"${favAttrs}>`
+      : '') +
+    '<div class="txt">' +
+    `<strong class="ttl">${escapeHtml(title)}</strong>` +
+    (meta.description ? `<span class="dsc">${escapeHtml(meta.description)}</span>` : '') +
+    '<div class="attr">' +
+    (meta.author ? `<em class="by">${escapeHtml(meta.author)}</em>` : '') +
+    (meta.publisher ? `<em class="pub">${escapeHtml(meta.publisher)}</em>` : '') +
+    '</div></div></div></a></div>';
+
+  return html.replace(/[\n\r]/g, ' ');
 };
-
-// module.exports = async function linkPreviewFilter(targetUrl, fullImage=false) {
-//   return (async () => {
-//     // Try to get the metadata from the cache.
-//     var metadata = cache.get(targetUrl);
-//     // If it isn't cached.
-//     if(!metadata) {
-//       // Make a web request.
-//       const { body: html, url } = await got(targetUrl);
-//       metadata = await metascraper({ html, url });
-//       // Cache it for subsequent runs.
-//       // Caching is retained for about a year.
-//       cache.set(targetUrl, metadata, 31556952);
-//     }
-//     // DEBUG
-//     //console.log(metadata);
-
-//     return `<a class="lp" href="${targetUrl}">
-//       <div class="flow">
-//         <div class="img">` +
-//           (metadata.logo ? `<img class="lp-img" src="${metadata.logo}" alt="${metadata.publisher}">` : '') +
-//         `</div>
-//         <div class="met">` +
-//           (metadata.title ? `<strong class="ttl">${metadata.title}<br></strong>` : '') +
-//           (metadata.description ? `<span class="dsc">${metadata.description}</span>` : '') +
-//           '<div class=attr>'+
-//             (metadata.author ? `<em class="by">${metadata.author}</em>` : '') +
-//             (metadata.publisher ? `<em class="pub">${metadata.publisher}</em>` : '') +
-//           '</div>'+
-//         `</div>
-//       </div>` +
-//       (fullImage && metadata.image ? `<img class="lp-img" src="${metadata.image}" alt="${metadata.title}">` : '') +
-//     '</a>'.replace(/[\n\r]/g, ' ');
-//   })()
-// };

@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SMS Blue Coin Tracker</title>
+<meta name="description" content="Interactive viewer for Super Mario Sunshine GCI save files: browse all 240 blue coins per save slot, across every area, with collection statistics.">
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/images/favicon.png" type="image/png">
+<link rel="icon" href="/assets/images/favicon.webp" type="image/webp">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
+  /* System font stacks (site convention): no webfont requests. */
 
   :root {
     --sky: #0a9fd4;
@@ -33,7 +37,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Titillium Web', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -56,7 +60,7 @@
   }
   .header-content { position: relative; max-width: 1100px; margin: 0 auto; }
   h1 {
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
     font-size: 1.6rem;
     font-weight: 700;
     color: var(--coin-glow);
@@ -124,7 +128,7 @@
     padding: 12px 16px;
     font-size: 0.85rem;
     color: #ff8080;
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
   }
 
   /* ── MAIN CONTENT ── */
@@ -149,7 +153,7 @@
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     cursor: pointer;
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--text-dim);
@@ -196,7 +200,7 @@
     min-width: 90px;
   }
   .summary-stat .val {
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
     font-size: 1.5rem;
     font-weight: 700;
     line-height: 1;
@@ -235,7 +239,7 @@
   .progress-label {
     font-size: 0.75rem;
     color: var(--text-dim);
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
   }
 
   /* Filter bar */
@@ -252,7 +256,7 @@
     border-radius: 99px;
     background: transparent;
     color: var(--text-dim);
-    font-family: 'Titillium Web', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
@@ -289,7 +293,7 @@
     letter-spacing: 0.02em;
   }
   .area-progress {
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
     font-size: 0.75rem;
   }
   .area-progress.complete { color: var(--collected); }
@@ -366,7 +370,7 @@
     border-radius: 4px;
     font-weight: 700;
     flex-shrink: 0;
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
     letter-spacing: 0.03em;
   }
   .tag-graffiti-m { background: #3d1a1a; color: #ff6b6b; }
@@ -377,7 +381,7 @@
   .tag-bird       { background: #1a3333; color: #6bffdf; }
   .tag-sand       { background: #3d3020; color: #ffd580; }
   .coin-offset {
-    font-family: 'Space Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
     font-size: 0.63rem;
     color: #2a5a80;
     flex-shrink: 0;
@@ -411,6 +415,7 @@
   </div>
 </header>
 
+<main id="main-content" tabindex="-1">
 <div id="dropzone">
   <div class="drop-area" id="dropArea">
     <span class="drop-icon">💾</span>
@@ -430,6 +435,7 @@
   <div class="slot-tabs" id="slotTabs"></div>
   <div id="slotContent"></div>
 </div>
+</main>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════

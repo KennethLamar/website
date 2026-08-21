@@ -20,9 +20,9 @@ permalink: "/tags/"
           {% for tag in collections.tagList %}
             {% set tagUrl %}/tags/{{ tag | slug }}/{% endset %}
             <li class="post-list__item">
-              <h3 class="font-base leading-tight text-600 weight-mid">
+              <h2 class="font-base leading-tight text-600 weight-mid">
                 <a href="{{ tagUrl | url }}" class="post-list__link" rel="bookmark">{{ tag }}</a>
-              </h3>
+              </h2>
             </li>
           {% endfor %}
           </ol>

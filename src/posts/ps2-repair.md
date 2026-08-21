@@ -9,12 +9,12 @@ tags:
   - hardware
 ---
 
-### Initial Assessment
+## Initial Assessment
 Yesterday, I attempted to repair a PS2 that was not turning on. 
 The red standby LED did not light up, and, upon pressing the power button, there was no response. 
 This indicated that there was an issue with some aspect of the console's power supply or the power button itself.
 
-### Diagnosing the Problem
+## Diagnosing the Problem
 To diagnose the problem, I began by checking the power cable, which was providing the expected 120V AC from the wall. 
 Next, I tested the power connector and switch, which passed through the 120V when switched on. 
 Then, I tested the power board fuse, which was still providing continuity and was intact. 
@@ -23,7 +23,7 @@ However, when I tested the power board output when turned on, it was providing n
 This confirmed that the power board was the issue, though further problems could still exist down the line. 
 I disassembled the console further but found no obvious faults on visual inspection. 
 
-### Finding a Solution
+## Finding a Solution
 I looked up prices for a replacement power board and found that they cost around $30. 
 However, an entire functional PS2 can be purchased for $70, making the repair costs unjustifiable. 
 Therefore, I reassembled the console and decided to call it a day.

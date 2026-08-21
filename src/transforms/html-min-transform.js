@@ -6,7 +6,9 @@ module.exports = function htmlMinTransform(value, outputPath) {
       useShortDoctype: true,
       removeComments: true,
       collapseWhitespace: true,
-      minifyCSS: true
+      // The global CSS is already minified by sass and inlined verbatim;
+      // letting html-minifier re-minify it drops declarations (csso merge).
+      minifyCSS: false
     });
     return minified;
   }

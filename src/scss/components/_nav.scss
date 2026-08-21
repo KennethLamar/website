@@ -13,7 +13,11 @@
     }
 
     > * + * {
-      margin-left: get-size(500);
+      margin-left: get-size(300);
+
+      @include media-query('md') {
+        margin-left: get-size(500);
+      }
     }
   }
 
