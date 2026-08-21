@@ -162,6 +162,25 @@ module.exports = function(config) {
           fs.rmSync(path.join(cacheDir, file), {force: true});
         }
       }
+      // Stale dist copies: when a variant is renamed (source image
+      // edited, or encoding options changed) its old name is pruned
+      // from the cache above but the dist copy would linger in the
+      // build output. Same GC semantics as the yt/previews blocks
+      // below, applied to the dist side instead. Passthrough
+      // originals from src/assets/images are never generated variants,
+      // so they survive even when unreferenced.
+      const imagesDist = path.join(distDir, 'assets/images');
+      if (fs.existsSync(imagesDist)) {
+        for (const file of fs.readdirSync(imagesDist)) {
+          const full = path.join(imagesDist, file);
+          if (!fs.statSync(full).isFile()) continue; // yt/, previews/
+          if (referenced.has(file)) continue;
+          if (fs.existsSync(path.join(__dirname, 'src/assets/images', file))) {
+            continue;
+          }
+          fs.rmSync(full, {force: true});
+        }
+      }
       // Same GC semantics for the YouTube poster cache: collected
       // references include "yt/<file>" entries. Stale dist copies are
       // removed too, so an old-format file (e.g. .jpg after the .webp
