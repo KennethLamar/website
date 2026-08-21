@@ -30,7 +30,15 @@ const IMAGE_OPTIONS = {
   urlPath: '/assets/images/',
   outputDir: './.cache/images/',
   svgAllowUpscale: true,
-  sharpOptions: {png: {compressionLevel: 9}}
+  sharpOptions: {png: {compressionLevel: 9}},
+  // Encode JPEG variants progressively: slow connections get a
+  // coarse-then-fine render as data arrives. Progressive JPEG is part
+  // of the JPEG standard (1992) and every browser that decodes JPEG
+  // decodes progressive, so this costs no legacy compatibility.
+  // WebP/AVIF stay baseline: sharp's libvips encoder has no
+  // progressive mode for them, and baseline is the most widely
+  // supported variant.
+  sharpJpegOptions: {progressive: true}
 };
 
 // One generation per source image per process: the same image referenced
