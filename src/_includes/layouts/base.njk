@@ -9,7 +9,18 @@
   <link rel="icon" href="{{ site.faviconPath }}.webp" type="image/webp" />
   <link rel="icon" href="{{ site.faviconPath }}.svg" type="image/svg" />
   {% include "partials/global/meta-info.njk" %}
-  <script>document.documentElement.classList.remove('no-js');</script>
+  <script>
+    document.documentElement.classList.remove('no-js');
+    // Apply the saved theme choice (stored by theme-toggle.js) before
+    // first paint so the page renders in the chosen theme with no flash.
+    // With no saved choice, CSS falls back to prefers-color-scheme.
+    try {
+      const savedTheme = localStorage.getItem('user-color-scheme');
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    } catch (e) {}
+  </script>
   <style id="global-css">{{ cssBuild.content | safe }}</style>
   {#
   <!-- Global site tag (gtag.js) - Google Analytics -->

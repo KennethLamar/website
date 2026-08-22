@@ -6,16 +6,14 @@
  */
 @mixin dark-mode() {
   @media (prefers-color-scheme: dark) {
-    :root {
-      --color-mode: 'dark';
-    }
-
-    :root:not([data-user-color-scheme]) {
+    :root:not([data-theme]) {
+      color-scheme: dark;
       @content;
     }
   }
 
-  [data-user-color-scheme='dark'] {
+  :root[data-theme='dark'] {
+    color-scheme: dark;
     @content;
   }
 }

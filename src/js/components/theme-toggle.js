@@ -6,62 +6,41 @@ class ThemeToggle extends HTMLElement {
     super();
 
     this.STORAGE_KEY = 'user-color-scheme';
-    this.COLOR_MODE_KEY = '--color-mode';
+    this.THEME_ATTRIBUTE = 'data-theme';
   }
 
   connectedCallback() {
     this.render();
   }
 
-  getCSSCustomProp(propKey) {
-    let response = getComputedStyle(document.documentElement).getPropertyValue(propKey);
+  // The theme in effect: the visitor's saved choice if they have made
+  // one (re-applied to <html> before first paint by the inline script
+  // in base.njk), otherwise the system preference.
+  getEffectiveSetting() {
+    const saved = localStorage.getItem(this.STORAGE_KEY);
 
-    // Tidy up the string if there’s something to work with
-    if (response.length) {
-      response = response.replace(/\'|"/g, '').trim();
+    if (saved === 'light' || saved === 'dark') {
+      return saved;
     }
 
-    // Return the string response by default
-    return response;
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
-  applySetting(passedSetting) {
-    let currentSetting = passedSetting || localStorage.getItem(this.STORAGE_KEY);
-
-    if (currentSetting) {
-      document.documentElement.setAttribute('data-user-color-scheme', currentSetting);
-      this.setButtonLabelAndStatus(currentSetting);
-    } else {
-      this.setButtonLabelAndStatus(this.getCSSCustomProp(this.COLOR_MODE_KEY));
-    }
+  // Record the choice so it persists across pages, apply it to <html>,
+  // and update the button label and status.
+  applySetting(setting) {
+    localStorage.setItem(this.STORAGE_KEY, setting);
+    document.documentElement.setAttribute(this.THEME_ATTRIBUTE, setting);
+    this.setButtonLabelAndStatus(setting);
   }
 
   toggleSetting() {
-    let currentSetting = localStorage.getItem(this.STORAGE_KEY);
-
-    switch (currentSetting) {
-      case null:
-        currentSetting =
-          this.getCSSCustomProp(this.COLOR_MODE_KEY) === 'dark' ? 'light' : 'dark';
-        break;
-      case 'light':
-        currentSetting = 'dark';
-        break;
-      case 'dark':
-        currentSetting = 'light';
-        break;
-    }
-
-    localStorage.setItem(this.STORAGE_KEY, currentSetting);
-
-    return currentSetting;
+    this.applySetting(this.getEffectiveSetting() === 'dark' ? 'light' : 'dark');
   }
 
-  setButtonLabelAndStatus(currentSetting) {
-    this.modeToggleButton.innerText = `${
-      currentSetting === 'dark' ? 'Light' : 'Dark'
-    } theme`;
-    this.modeStatusElement.innerText = `Color mode is now "${currentSetting}"`;
+  setButtonLabelAndStatus(setting) {
+    this.modeToggleButton.innerText = `${setting === 'dark' ? 'Light' : 'Dark'} theme`;
+    this.modeStatusElement.innerText = `Color mode is now "${setting}"`;
   }
 
   render() {
@@ -84,10 +63,10 @@ class ThemeToggle extends HTMLElement {
     this.modeToggleButton.addEventListener('click', evt => {
       evt.preventDefault();
 
-      this.applySetting(this.toggleSetting());
+      this.toggleSetting();
     });
 
-    this.applySetting();
+    this.setButtonLabelAndStatus(this.getEffectiveSetting());
   }
 }
 
