@@ -21,3 +21,15 @@
     }
   }
 }
+
+// lite-youtube-embed renders an absolute-positioned <img> thumbnail
+// inside the <lite-youtube> element; pin it to fill the box.
+lite-youtube > .yt-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}

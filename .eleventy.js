@@ -466,6 +466,30 @@ module.exports = function(config) {
             : url
       );
     });
+    // The plugin's lite markup ships the poster as a CSS background-image
+    // on <lite-youtube>, which the browser fetches with the page regardless
+    // of position. Swap it for a lazy <img> child (same treatment as the
+    // site's other below-fold images) so below-fold embeds don't burn
+    // initial bandwidth. Runs after localizeYtThumbnails, so it sees the
+    // localized URL. The style is kept as an explicit "background-image:
+    // none" rather than removed: lite-yt-embed's script sets a remote
+    // i.ytimg.com poster on the element whenever its inline background
+    // is empty, and that would re-fetch the poster eagerly and
+    // externally.
+    eleventyConfig.addTransform('lazyYtThumbnails', (content, outputPath) => {
+      if (
+        !outputPath ||
+        !outputPath.endsWith('.html') ||
+        !content.includes('lite-youtube')
+      ) {
+        return content;
+      }
+      return content.replace(
+        /(<lite-youtube[^>]*?)(?:\s+)?style="background-image: url\('([^']+)'\);"([^>]*)>/g,
+        (match, prefix, url, tail) =>
+          `${prefix}${tail} style="background-image:none"><img class="yt-thumb" src="${url}" alt="" loading="lazy" decoding="async">`
+      );
+    });
   });
   config.addPlugin(rssPlugin);
   config.addPlugin(syntaxHighlight);
