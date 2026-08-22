@@ -1,0 +1,11 @@
+// Load the default config as a fallback for when the user hasn't
+// yet set up config for the project
+@use 'default-config';
+
+@use 'functions/functions';
+@use 'utilities/utilities';
+@use 'mixins/mixins';
+@use 'generator/generator';
+
+@forward 'functions/functions';
+@forward 'mixins/mixins';

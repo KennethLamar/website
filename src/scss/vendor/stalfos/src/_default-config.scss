@@ -1,39 +1,46 @@
-@use "sass:math";
-@use "sass:map";
-@use 'tokens' as *;
+@use 'sass:math';
+
+/**
+ * BASE SIZE
+ * All calculations are based on this. It's recommended that
+ * you keep it at 1rem because that is the root font size. You
+ * can set it to whatever you like and whatever unit you like.
+ */
+$stalfos-base-size: 1rem !default;
 
 /**
  * SIZE SCALE
  * This is a Major Third scale that powers all the utilities that
  * it is relevant for (font-size, margin, padding). All items are
- * calcuated off these tokens.
+ * calcuated off the base size, so change that and cascade across
+ * your whole project.
  */
-$stalfos-size-scale: map.get($tokens, 'size-scale');
+$stalfos-size-scale: (
+  '300': $stalfos-base-size * 0.8,
+  '400': $stalfos-base-size,
+  '500': $stalfos-base-size * 1.25,
+  '600': $stalfos-base-size * 1.6,
+  '700': $stalfos-base-size * 2,
+  '900': $stalfos-base-size * 3
+) !default;
 
 /**
  * COLORS
- * Colors are shared between backgrounds and text by default. 
+ * Colors are shared between backgrounds and text by default.
  * You can also use them to power borders, fills or shadows, for example.
  */
-$stalfos-colors: map.get($tokens, 'colors');
+$stalfos-colors: (
+  'dark': #1a1a1a,
+  'light': #f3f3f3
+) !default;
 
 /**
  * UTIL PREFIX
- * All pre-built, framework utilities will have this prefix. 
+ * All pre-built, framework utilities will have this prefix.
  * Example: the wrapper utility is '.sf-wrapper' because the default
  * prefix is 'sf-'.
  */
-$stalfos-util-prefix: 'sf-';
-
-/**
- * METRICS
- * Various misc metrics to use around the site
- */
-$metrics: (
-  'wrap-max-width': 58rem,
-  'wrap-inner-max-width': 52rem,
-  'md-breakpoint': 48rem
-);
+$stalfos-util-prefix: 'sf-' !default;
 
 /**
  * CORE CONFIG
@@ -41,15 +48,6 @@ $metrics: (
  * to enabling/disabling pre-built components/utilities.
  */
 $stalfos-config: (
-  'align': (
-    'items': (
-      'start': 'flex-start',
-      'center': 'center',
-      'end': 'flex-end'
-    ),
-    'output': 'responsive',
-    'property': 'align-items'
-  ),
   'bg': (
     'items': $stalfos-colors,
     'output': 'standard',
@@ -64,14 +62,16 @@ $stalfos-config: (
     'items': (
       'block': 'block',
       'flex': 'flex',
-      'inline-flex': 'inline-flex',
-      'hide': 'none'
+      'hide': 'none',
+      'show': 'inherit'
     ),
     'output': 'responsive',
     'property': 'display'
   ),
   'font': (
-    'items': map.get($tokens, 'fonts'),
+    'items': (
+      'base': 'Helvetica, Arial, sans-serif'
+    ),
     'output': 'standard',
     'property': 'font-family'
   ),
@@ -80,33 +80,30 @@ $stalfos-config: (
     'output': 'standard',
     'property': 'margin-top'
   ),
+  'gap-right': (
+    'items': $stalfos-size-scale,
+    'output': 'standard',
+    'property': 'margin-right'
+  ),
   'gap-bottom': (
     'items': $stalfos-size-scale,
     'output': 'standard',
     'property': 'margin-bottom'
   ),
-  'leading': (
-    'items': (
-      'tight': '1.2',
-      'mid': '1.5',
-      'loose': '1.7'
-    ),
+  'gap-left': (
+    'items': $stalfos-size-scale,
     'output': 'standard',
-    'property': 'line-height'
-  ),
-  'measure': (
-    'items': (
-      'long': '75ch',
-      'short': '60ch',
-      'compact': '40ch'
-    ),
-    'output': 'standard',
-    'property': 'max-width'
+    'property': 'margin-left'
   ),
   'pad-top': (
     'items': $stalfos-size-scale,
     'output': 'standard',
     'property': 'padding-top'
+  ),
+  'pad-right': (
+    'items': $stalfos-size-scale,
+    'output': 'standard',
+    'property': 'padding-right'
   ),
   'pad-bottom': (
     'items': $stalfos-size-scale,
@@ -116,16 +113,7 @@ $stalfos-config: (
   'pad-left': (
     'items': $stalfos-size-scale,
     'output': 'standard',
-    'property': 'padding-left'
-  ),
-  'space': (
-    'items': (
-      'between': 'space-between',
-      'around': 'space-around',
-      'before': 'flex-end'
-    ),
-    'output': 'responsive',
-    'property': 'justify-content'
+    'property': 'pad-left'
   ),
   'stack': (
     'items': (
@@ -138,15 +126,6 @@ $stalfos-config: (
     'output': 'standard',
     'property': 'z-index'
   ),
-  'ta': (
-    'items': (
-      'right': 'right',
-      'left': 'left',
-      'center': 'center'
-    ),
-    'output': 'responsive',
-    'property': 'text-align'
-  ),
   'text': (
     'items': $stalfos-size-scale,
     'output': 'responsive',
@@ -156,7 +135,6 @@ $stalfos-config: (
     'items': (
       'light': '300',
       'regular': '400',
-      'mid': '600',
       'bold': '700'
     ),
     'output': 'standard',
@@ -173,23 +151,14 @@ $stalfos-config: (
     'property': 'width'
   ),
   'breakpoints': (
-    'md': #{'(min-width: ' + map.get($metrics, 'md-breakpoint') + ')'}
+    'sm': '(min-width: 36em)',
+    'md': '(min-width: 48em)',
+    'lg': '(min-width: 62em)'
   ),
   'utilities': (
     'reset': 'on',
-    'icon': 'off',
+    'icon': 'on',
     'flow': 'on',
-    'wrapper': 'off'
+    'wrapper': 'on'
   )
-);
-
-// Configure the vendored stalfos library (src/scss/vendor/stalfos)
-// with this project's values. The with-clause must come after the
-// variable declarations above; the library loads this module once
-// (cached), so every library function and mixin sees these values.
-@use 'vendor/stalfos/src/default-config' with (
-  $stalfos-size-scale: $stalfos-size-scale,
-  $stalfos-colors: $stalfos-colors,
-  $stalfos-util-prefix: $stalfos-util-prefix,
-  $stalfos-config: $stalfos-config
-);
+) !default;

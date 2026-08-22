@@ -1,3 +1,6 @@
+@use '../vendor/stalfos/stalfos' as *;
+@use '../utilities/visually-hidden';
+
 // Hide skip link visually by default
 .skip-link:not(:focus) {
   @extend %visually-hidden;

@@ -1,3 +1,5 @@
+@use '../vendor/stalfos/stalfos' as *;
+
 .lp {
 	border: 1px solid get-color('highlight');
 	margin-bottom: 20px;

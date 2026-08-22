@@ -1,0 +1,16 @@
+@use 'sass:map';
+@use '../default-config' as dc;
+@use 'workers/cycle' as *;
+
+// Run the standard cycle first
+@include cycle('', false);
+
+// For each breakpoint, generate a prefix and run the cycle
+@each $key, $value in map.get(dc.$stalfos-config, 'breakpoints') {
+  $prefix: #{$key + '\\:'};
+  $is-breakpoint: true;
+
+  @media screen and #{$value} {
+    @include cycle($prefix, $is-breakpoint);
+  }
+}

@@ -1,0 +1,28 @@
+@use '../default-config' as dc;
+@use '../functions/functions' as *;
+
+/**
+ * WRAPPER UTILITY
+ * A handy container utility that sets a max-width and centers itself,
+ * using auto margin.
+ * You can configure the max-width, gutter, class prefix and even the
+ * block name.
+ */
+
+// Config items
+$stalfos-utility-wrapper__max-width: 70rem !default;
+$stalfos-utility-wrapper__gutter: dc.$stalfos-base-size !default;
+$stalfos-utility-wrapper__enabled: get-config-value('wrapper', 'utilities') !default;
+$stalfos-utility-wrapper__prefix: dc.$stalfos-util-prefix !default;
+$stalfos-utility-wrapper__block: 'wrapper';
+
+// Block starts if enabled in your `$stalfos-config`
+@if ($stalfos-utility-wrapper__enabled == 'on') {
+  #{ '.' + $stalfos-utility-wrapper__prefix + $stalfos-utility-wrapper__block } {
+    max-width: $stalfos-utility-wrapper__max-width;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: $stalfos-utility-wrapper__gutter;
+    padding-right: $stalfos-utility-wrapper__gutter;
+  }
+}

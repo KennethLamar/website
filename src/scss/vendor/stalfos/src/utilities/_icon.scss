@@ -1,0 +1,24 @@
+@use '../default-config' as dc;
+@use '../functions/functions' as *;
+
+/**
+ * ICON UTILITY
+ * Adds a default icon class (default selector) .sf-icon
+ * to make inline icons the same size as the surrounding text.
+ * The icon can be configured below.
+ */
+
+// Config items
+$stalfos-utility-icon__size: 1em !default;
+$stalfos-utility-icon__enabled: get-config-value('icon', 'utilities') !default;
+$stalfos-utility-icon__prefix: dc.$stalfos-util-prefix !default;
+$stalfos-utility-icon__block: 'icon';
+
+// Block starts if enabled in your `$stalfos-config`
+@if ($stalfos-utility-icon__enabled == 'on') {
+  #{ '.' + $stalfos-utility-icon__prefix + $stalfos-utility-icon__block } {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+  }
+}

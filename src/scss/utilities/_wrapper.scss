@@ -1,5 +1,9 @@
+@use 'sass:map';
+@use '../config' as cfg;
+@use '../vendor/stalfos/stalfos' as *;
+
 .wrapper {
-  max-width: map-get($metrics, 'wrap-max-width');
+  max-width: map.get(cfg.$metrics, 'wrap-max-width');
   margin-left: auto;
   margin-right: auto;
   padding-left: get-size(500);

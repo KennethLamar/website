@@ -1,3 +1,5 @@
+@use '../vendor/stalfos/stalfos' as *;
+
 .post-list {
   &__item {
     --flow-space: #{get-size(700)};

@@ -1,80 +1,41 @@
-@import 'config';
-
-// Pull in the stalfos lib
-@import '../../node_modules/stalfos/stalfos.scss';
-
+// This project's config. Its trailing with-clause configures the
+// vendored stalfos library's default-config module with the
+// project's values (see _config.scss).
+@use 'config';
+// Pull in the stalfos lib (vendored, @use-ified)
+@use 'vendor/stalfos/stalfos';
 // Local mixins
-@import 'mixins/dark-mode';
+@use 'mixins/dark-mode';
 
-@import 'theme';
+@use 'theme';
 
 // Local dependencies
-@import 'typography';
+@use 'typography';
 
-/**
- * GLOBAL STYLES
- */
-html,
-body {
-  height: 100%;
-}
-
-body {
-  scroll-behavior: smooth;
-  display: flex;
-  flex-direction: column;
-}
-
-main {
-  flex: 1 0 auto;
-  &:focus {
-    outline: none;
-  }
-}
-
-hr {
-  display: block;
-  height: 1px;
-  max-width: 500px;
-  background: var(--color-stroke);
-  border: none;
-  margin: get-size(900) auto;
-}
-
-// For when metric attributes are added to img elements
-img {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-}
-
-:focus {
-  outline: 1px solid var(--color-theme-primary-glare);
-  outline-offset: 0.25rem;
-}
+// Global styles (html/body, hr, img, focus outlines)
+@use 'base';
 
 /**
  * PROJECT IMPORTS
  */
 
 // Utils
-@import 'utilities/inner-wrapper';
-@import 'utilities/visually-hidden';
-@import 'utilities/wrapper';
+@use 'utilities/inner-wrapper';
+@use 'utilities/visually-hidden';
+@use 'utilities/wrapper';
 
 // Components
-@import 'components/button';
-@import 'components/form';
-@import 'components/heading-permalink';
-@import 'components/intro';
-@import 'components/link-preview';
-@import 'components/nav';
-@import 'components/pagination';
-@import 'components/post';
-@import 'components/post-list';
-@import 'components/site-head';
-@import 'components/site-foot';
-@import 'components/skip-link';
-@import 'components/syntax-highlighting';
-@import 'components/video-player';
+@use 'components/button';
+@use 'components/form';
+@use 'components/heading-permalink';
+@use 'components/intro';
+@use 'components/link-preview';
+@use 'components/nav';
+@use 'components/pagination';
+@use 'components/post';
+@use 'components/post-list';
+@use 'components/site-head';
+@use 'components/site-foot';
+@use 'components/skip-link';
+@use 'components/syntax-highlighting';
+@use 'components/video-player';

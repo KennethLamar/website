@@ -17,7 +17,6 @@
     "posthtml-parser": "^0.11.0",
     "sass": "^1.26.3",
     "slugify": "^1.4.0",
-    "stalfos": "https://github.com/hankchizljaw/stalfos.git#c8971d22726326cfc04089b2da4d51eeb1ebb0eb",
     "ws": "^8.21.3"
   },
   "devDependencies": {
