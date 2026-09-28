@@ -4,6 +4,8 @@ const embedYouTube = require('eleventy-plugin-youtube-embed');
 const zlib = require('zlib');
 const fs = require('fs');
 const path = require('path');
+const CleanCSS = require('clean-css');
+const UglifyJS = require('uglify-js');
 
 // Import filters
 const dateFilter = require('./src/filters/date-filter.js');
@@ -66,10 +68,8 @@ module.exports = function(config) {
   config.addPassthroughCopy('src/assets');
   config.addPassthroughCopy('src/js');
   config.addPassthroughCopy('src/files');
-  config.addPassthroughCopy('src/ai');
   config.addPassthroughCopy('src/admin/config.yml');
   config.addPassthroughCopy('src/admin/previews.js');
-  config.addPassthroughCopy('node_modules/nunjucks/browser/nunjucks-slim.js');
   config.addPassthroughCopy('src/robots.txt');
   config.addPassthroughCopy('src/_headers');
   // The compiled stylesheet is published to .cache/css-build.json (gitignored
@@ -266,6 +266,51 @@ module.exports = function(config) {
   // variants include it.
   const runKatexInline = require('./scripts/katex-inline.cjs');
   config.on('afterBuild', () => runKatexInline());
+  // The coin tracker (src/ai/sms-blue-coin-tracker.html) is a
+  // self-contained template: no front matter, no site layout. Eleventy
+  // renders it to dist/ai/sms-blue-coin-tracker/index.html (transformed
+  // and minified). Mirror the built page to the flat
+  // dist/ai/sms-blue-coin-tracker.html so that URL serves the same output
+  // — a passthrough copy of the source used to ship the raw, unminified
+  // file there. Registered before the compression pass so the mirror
+  // gets its .br/.gz variants too.
+  config.on('afterBuild', () => {
+    const indexFile = path.join(
+      __dirname,
+      'dist',
+      'ai',
+      'sms-blue-coin-tracker',
+      'index.html'
+    );
+    if (!fs.existsSync(indexFile)) return;
+    // Per-file read+write: fs.copyFileSync hits EPERM on virtual
+    // (v9fs/9p) filesystems (see the image-sync hooks above).
+    fs.writeFileSync(
+      path.join(__dirname, 'dist', 'ai', 'sms-blue-coin-tracker.html'),
+      fs.readFileSync(indexFile)
+    );
+  });
+  // The self-hosted lite-youtube-embed script is a vendored jsDelivr
+  // build carrying a 5-line header comment. Minify the dist copy in
+  // place (drops the comment, single line) so the served file is fully
+  // minified. Registered before the compression pass so the .br/.gz
+  // variants match.
+  config.on('afterBuild', () => {
+    const jsFile = path.join(
+      __dirname,
+      'dist',
+      'js',
+      'components',
+      'lite-yt-embed.min.js'
+    );
+    if (!fs.existsSync(jsFile)) return;
+    const result = UglifyJS.minify(fs.readFileSync(jsFile, 'utf8'), {
+      compress: true,
+      mangle: true
+    });
+    if (result.error || !result.code) return;
+    fs.writeFileSync(jsFile, result.code);
+  });
   // Pre-compress text assets (brotli + gzip) after each production build,
   // so the site is fast on any static host — it does not depend on the
   // platform's own compression. Runs after the build completes, when
@@ -428,10 +473,10 @@ module.exports = function(config) {
   // transform; the render pipeline snapshots the list before beforeBuild.)
   config.addPlugin(eleventyConfig => {
     // The embed plugin (css: { inline: true }) inlines lite-youtube-embed's
-    // full unminified CSS at the first <lite-youtube> embed. Swap it for
-    // the vendored min build (same rules, no comments) so embed pages don't
-    // ship extra whitespace. Exact string match on the plugin's own output,
-    // so a post's own <style> block is never touched.
+    // full unminified CSS at the first <lite-youtube> embed. Minify it at
+    // build time (whitespace and comments only; no rewrites) so embed
+    // pages don't ship extra bytes. Exact string match on the plugin's own
+    // output, so a post's own <style> block is never touched.
     const unminCss = fs.readFileSync(
       path.join(
         __dirname,
@@ -442,13 +487,25 @@ module.exports = function(config) {
       ),
       'utf8'
     );
-    const minCss = fs.readFileSync(
-      path.join(__dirname, 'src', 'js', 'components', 'lite-yt-embed.min.css'),
-      'utf8'
-    );
+    const ytCssMinified = new CleanCSS({level: 1}).minify(unminCss);
+    const minifiedYtCss = ytCssMinified.errors.length ? unminCss : ytCssMinified.styles;
     eleventyConfig.addTransform('minifyYtEmbedCss', content =>
-      content.replace(`<style>${unminCss}</style>`, `<style>${minCss}</style>`)
+      content.replace(`<style>${unminCss}</style>`, `<style>${minifiedYtCss}</style>`)
     );
+    // The plugin injects its markup after the html-min transform ran,
+    // leaving newlines around its <style>/<script> tags. Collapse the
+    // remaining newlines outside <script>/<style> blocks (their string
+    // content may legitimately contain newlines) so the page stays a
+    // single line.
+    eleventyConfig.addTransform('collapsePostPluginNewlines', (content, outputPath) => {
+      if (!outputPath || !outputPath.endsWith('.html') || !content.includes('\n')) {
+        return content;
+      }
+      return content.replace(
+        /(<(script|style)[^>]*>[\s\S]*?<\/\2>)|\n/g,
+        (match, block) => block || ''
+      );
+    });
     eleventyConfig.addTransform('localizeYtThumbnails', (content, outputPath) => {
       if (
         !outputPath ||

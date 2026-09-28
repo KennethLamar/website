@@ -8,8 +8,8 @@
  *
  *  - A class selector is kept when every class it requires is present on the
  *    page. "Present" = in any class="..." attribute of the HTML, or in the
- *    markup the page's own scripts create at runtime (theme-toggle renders
- *    its whole UI in JS; lite-youtube adds its play button in JS). Class
+ *    markup the page's own scripts create at runtime (lite-youtube adds its
+ *    play button in JS; the theme toggle is static markup). Class
  *    names compare in their unescaped form, so .md\:ta-right matches
  *    class="md:ta-right".
  *  - @media / @supports blocks are recursed into, so dark-mode and
@@ -128,11 +128,12 @@ function requiredClasses(selector) {
               hex += selector[k + 1];
               k++;
             }
+            k++;
             name += String.fromCodePoint(parseInt(hex, 16));
-            if (k + 1 < n && selector[k + 1] === ' ') k++;
+            if (k < n && selector[k] === ' ') k++;
           } else {
             name += next;
-            k++;
+            k += 2;
           }
           continue;
         }

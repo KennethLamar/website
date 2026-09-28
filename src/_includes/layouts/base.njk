@@ -11,8 +11,9 @@
   {% include "partials/global/meta-info.njk" %}
   <script>
     document.documentElement.classList.remove('no-js');
-    // Apply the saved theme choice (stored by theme-toggle.js) before
-    // first paint so the page renders in the chosen theme with no flash.
+    // Apply the saved theme choice (stored by the inline theme-toggle
+    // script at the end of <body>) before first paint so the page
+    // renders in the chosen theme with no flash.
     // With no saved choice, CSS falls back to prefers-color-scheme.
     try {
       const savedTheme = localStorage.getItem('user-color-scheme');
@@ -42,6 +43,33 @@
   {% include "partials/global/site-foot.njk" %}
   {% block foot %}
   {% endblock %}
-  <script type="module" src="/js/components/theme-toggle.js" async defer></script>
+  <script>
+    // Theme toggle. With no saved choice the effective mode follows the
+    // system preference (CSS prefers-color-scheme fallback); clicking
+    // records an explicit choice in localStorage that overrides it.
+    (() => {
+      const key = 'user-color-scheme';
+      const btn = document.querySelector('.js-mode-toggle');
+      if (!btn) return;
+      const status = document.querySelector('.js-mode-status');
+      const effective = () => {
+        let saved = null;
+        try { saved = localStorage.getItem(key); } catch (e) {}
+        if (saved === 'light' || saved === 'dark') return saved;
+        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+      const show = mode => {
+        btn.innerText = `${mode === 'dark' ? 'Light' : 'Dark'} theme`;
+        if (status) status.innerText = `Color mode is now "${mode}"`;
+      };
+      btn.addEventListener('click', () => {
+        const next = effective() === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem(key, next); } catch (e) {}
+        document.documentElement.setAttribute('data-theme', next);
+        show(next);
+      });
+      show(effective());
+    })();
+  </script>
 </body>
 </html>
